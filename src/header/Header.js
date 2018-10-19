@@ -3,7 +3,7 @@ import "./Header.scss";
 
 const Header = () => (
   <header>
-    <h1>Sweet Pumpkins</h1>
+    <h1>Find Me A Movie</h1>
   </header>
 );
 
