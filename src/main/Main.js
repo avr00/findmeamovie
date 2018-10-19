@@ -93,7 +93,7 @@ class Main extends React.Component {
       `page=${page}`;
 
     this.setState({ moviesUrl });
-    console.log(moviesUrl);
+
   };
 
   onSearchButtonClick = () => {

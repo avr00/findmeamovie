@@ -6,7 +6,6 @@ import Movie from "./movie/Movie";
 import NotFound from "./NotFound";
 
 const App = () => {
-  console.log("API key:", process.env.REACT_APP_TMDB_API_KEY);
   return (
     <BrowserRouter>
       <div>

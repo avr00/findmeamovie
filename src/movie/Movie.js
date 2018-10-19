@@ -18,7 +18,6 @@ class Movie extends React.Component {
       .then(data => this.setState({ movie: data, isLoading: false }))
       .catch(error => console.log("Error:", error));
 
-    console.log(this.state.movie, movieUrl);
   }
 
   render() {
