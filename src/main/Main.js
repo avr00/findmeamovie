@@ -5,8 +5,11 @@ import Movies from "./movies/Movies";
 
 class Main extends React.Component {
   state = {
+    movies: [],
+    total_pages: 1,
     genre: "comedy",
     genres: [],
+    page: 1,
     moviesUrl: `https://api.themoviedb.org/3/discover/movie?api_key=${
       process.env.REACT_APP_TMDB_API_KEY
     }&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`,
@@ -33,6 +36,19 @@ class Main extends React.Component {
     }
   };
 
+  componentDidMount() {
+    this.fetchMovies(this.state.moviesUrl);
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (this.state.moviesUrl !== nextState.moviesUrl) {
+      this.fetchMovies(nextState.moviesUrl);
+    }
+    if (this.state.page !== nextState.page) {
+      this.generateUrl();
+    }
+  }
+
   onChange = data => {
     this.setState({
       [data.type]: {
@@ -51,9 +67,10 @@ class Main extends React.Component {
   };
 
   generateUrl = () => {
-    const { genres, year, rating, runtime } = this.state;
+    const { genres, year, rating, runtime, page } = this.state;
     const selectedGenre = genres.find(genre => genre.name === this.state.genre);
-    const genreId = selectedGenre.id;
+    const genreId =
+      typeof selectedGenre === "undefined" ? 28 : selectedGenre.id;
 
     const moviesUrl =
       `https://api.themoviedb.org/3/discover/movie?` +
@@ -66,13 +83,60 @@ class Main extends React.Component {
       `vote_average.lte=${rating.value.max}&` +
       `with_runtime.gte=${runtime.value.min}&` +
       `with_runtime.lte=${runtime.value.max}&` +
-      `page=1&`;
+      `page=${page}`;
 
     this.setState({ moviesUrl });
+    console.log(moviesUrl);
   };
 
   onSearchButtonClick = () => {
     this.generateUrl();
+  };
+
+  fetchMovies = url => {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => this.storeMovies(data))
+      .catch(error => console.log(error));
+  };
+
+  storeMovies = data => {
+    const movies = data.results.map(result => {
+      const {
+        vote_count,
+        id,
+        genre_ids,
+        poster_path,
+        title,
+        vote_average,
+        release_date
+      } = result;
+      return {
+        vote_count,
+        id,
+        genre_ids,
+        poster_path,
+        title,
+        vote_average,
+        release_date
+      };
+    });
+    this.setState({ movies, total_pages: data.total_pages });
+  };
+
+  onPageIncrease = () => {
+    const { page, total_pages } = this.state;
+    const nextPage = page + 1;
+    if (nextPage <= total_pages) {
+      this.setState({ page: nextPage });
+    }
+  };
+
+  onPageDecrease = () => {
+    const nextPage = this.state.page - 1;
+    if (nextPage > 0) {
+      this.setState({ page: nextPage });
+    }
   };
 
   render() {
@@ -85,7 +149,12 @@ class Main extends React.Component {
           onSearchButtonClick={this.onSearchButtonClick}
           {...this.state}
         />
-        <Movies moviesUrl={this.state.moviesUrl} />
+        <Movies
+          movies={this.state.movies}
+          page={this.state.page}
+          onPageDecrease={this.onPageDecrease}
+          onPageIncrease={this.onPageIncrease}
+        />
       </section>
     );
   }

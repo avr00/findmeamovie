@@ -1,63 +1,23 @@
 import React from "react";
 import "./Movies.scss";
 import MovieListItem from "./MovieListItem";
+import Button from "../navigation/Button";
 
-class Movies extends React.Component {
-  state = {
-    movies: []
-  };
-
-  componentDidMount() {
-    this.fetchMovies(this.props.moviesUrl);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.moviesUrl !== nextProps.moviesUrl) {
-      this.fetchMovies(nextProps.moviesUrl);
-    }
-  }
-
-  fetchMovies = url => {
-    fetch(url)
-      .then(response => response.json())
-      .then(data => this.storeMovies(data))
-      .catch(error => console.log(error));
-  };
-
-  storeMovies = data => {
-    const movies = data.results.map(result => {
-      const {
-        vote_count,
-        id,
-        genre_ids,
-        poster_path,
-        title,
-        vote_average,
-        release_date
-      } = result;
-      return {
-        vote_count,
-        id,
-        genre_ids,
-        poster_path,
-        title,
-        vote_average,
-        release_date
-      };
-    });
-    this.setState({ movies });
-  };
-  render() {
-    return (
-      <section className="movies">
-        <ul className="movies">
-          {this.state.movies.map(movie => {
-            return <MovieListItem key={movie.id} movie={movie} />;
-          })}
-        </ul>
-      </section>
-    );
-  }
-}
+const Movies = props => {
+  return (
+    <section className="movies">
+      <ul className="movies">
+        {props.movies.map(movie => {
+          return <MovieListItem key={movie.id} movie={movie} />;
+        })}
+      </ul>
+      <div className="pagination">
+        <Button onClick={props.onPageDecrease}>Previous</Button>
+        <span>{`Page ${props.page}`}</span>
+        <Button onClick={props.onPageIncrease}>Next</Button>
+      </div>
+    </section>
+  );
+};
 
 export default Movies;
