@@ -37,15 +37,22 @@ class Main extends React.Component {
   };
 
   componentDidMount() {
-    this.fetchMovies(this.state.moviesUrl);
+    const savedState = this.getStateFromLocalStorage();
+    if (!savedState || (savedState && !savedState.movies.length)) {
+      this.fetchMovies(this.state.moviesUrl);
+    } else {
+      this.setState({ ...savedState });
+      this.generateUrl(savedState);
+    }
   }
 
   componentWillUpdate(nextProps, nextState) {
+    this.saveStateToLocalStorage();
     if (this.state.moviesUrl !== nextState.moviesUrl) {
       this.fetchMovies(nextState.moviesUrl);
     }
     if (this.state.page !== nextState.page) {
-      this.generateUrl();
+      this.generateUrl(nextState);
     }
   }
 
@@ -66,9 +73,9 @@ class Main extends React.Component {
     this.setState({ genres });
   };
 
-  generateUrl = () => {
-    const { genres, year, rating, runtime, page } = this.state;
-    const selectedGenre = genres.find(genre => genre.name === this.state.genre);
+  generateUrl = params => {
+    const { genres, year, rating, runtime, page } = params;
+    const selectedGenre = genres.find(genre => genre.name === params.genre);
     const genreId =
       typeof selectedGenre === "undefined" ? 28 : selectedGenre.id;
 
@@ -90,7 +97,7 @@ class Main extends React.Component {
   };
 
   onSearchButtonClick = () => {
-    this.generateUrl();
+    this.generateUrl(this.state);
   };
 
   fetchMovies = url => {
@@ -137,6 +144,14 @@ class Main extends React.Component {
     if (nextPage > 0) {
       this.setState({ page: nextPage });
     }
+  };
+
+  saveStateToLocalStorage = () => {
+    localStorage.setItem("findmeamovie.params", JSON.stringify(this.state));
+  };
+
+  getStateFromLocalStorage = () => {
+    return JSON.parse(localStorage.getItem("findmeamovie.params"));
   };
 
   render() {
