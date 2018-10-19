@@ -8,14 +8,21 @@ class Movies extends React.Component {
   };
 
   componentDidMount() {
-    const apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${
-      process.env.REACT_APP_TMDB_API_KEY
-    }&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`;
-    fetch(apiUrl)
+    this.fetchMovies(this.props.moviesUrl);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.moviesUrl !== nextProps.moviesUrl) {
+      this.fetchMovies(nextProps.moviesUrl);
+    }
+  }
+
+  fetchMovies = url => {
+    fetch(url)
       .then(response => response.json())
       .then(data => this.storeMovies(data))
       .catch(error => console.log(error));
-  }
+  };
 
   storeMovies = data => {
     const movies = data.results.map(result => {
