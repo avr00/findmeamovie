@@ -17,12 +17,12 @@ const MovieListItem = props => {
           <section className="movie-details">
             <div className="movie-year">
               <span className="title">Year</span>
-              <span>{year}</span>
+              <span className="num">{year}</span>
             </div>
 
             <div className="movie-rating">
               <span className="title">Rating</span>
-              <span>{vote_average}</span>
+              <span className="num">{vote_average}</span>
             </div>
           </section>
         </div>
